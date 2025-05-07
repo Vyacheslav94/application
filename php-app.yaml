@@ -2,10 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: php-app
-  labels:
-    app: php-app
 spec:
-  replicas: 2  # 2 реплики для отказоустойчивости
+  replicas: 1
   selector:
     matchLabels:
       app: php-app
@@ -15,19 +13,19 @@ spec:
         app: php-app
     spec:
       containers:
-      - name: php-app
-        image: 443370672158.dkr.ecr.us-east-1.amazonaws.com/php-app:latest
-        ports:
-        - containerPort: 80
-        readinessProbe:  # Добавляем проверку готовности
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 5
-        livenessProbe:  # Добавляем проверку работоспособности
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 29
-          periodSeconds: 20
+        - name: php-app
+          image: 443370672158.dkr.ecr.us-east-1.amazonaws.com/php-app:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-app-service
+spec:
+  selector:
+    app: php-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
